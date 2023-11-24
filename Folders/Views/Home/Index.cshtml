@@ -1,0 +1,23 @@
+﻿@model Folders.DAL.Entities.Folder
+
+
+<div class="text-center">
+
+    <h2 class="display-4">"Folder" - @Model.Name</h2>
+
+    @if(Model.Children is not null)
+    {
+        <ul>
+            @foreach (var entity in Model.Children)
+            {
+                <li>
+                    <a asp-controller="Home" asp-action="GetFolder" asp-route-id="@entity.Id">@entity.Name</a>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <h3>This folder has no children</h3>
+    }
+</div>
