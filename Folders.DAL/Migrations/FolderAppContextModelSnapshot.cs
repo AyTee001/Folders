@@ -41,7 +41,7 @@ namespace Folders.DAL.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Folders");
+                    b.ToTable("Folders", (string)null);
 
                     b.HasData(
                         new

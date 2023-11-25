@@ -1,7 +1,6 @@
 using Folders.Interfaces;
 using Folders.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace Folders.Controllers
 {
@@ -11,19 +10,59 @@ namespace Folders.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _folderService.GetPrincipalFolder());
+            return View(await _folderService.GetPrincipalFolderAsync());
+        }
+
+        public IActionResult ChangeFolders()
+        {
+            return View(new FolderManagementModel());
         }
 
         [HttpGet]
         public async Task<IActionResult> GetFolder(long id)
         {
-            return View("Index", await _folderService.GetFolder(id));
+            return View(nameof(Index), await _folderService.GetFolderAsync(id));
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [HttpPost]
+        public async Task<IActionResult> NewFoldersFromPC(FolderManagementModel model)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            try
+            {
+                await _folderService.ImportFoldersFromPCAndSaveAsync(model.FolderForScanPath);
+            }
+            catch (Exception)
+            {
+                return RedirectToAction(nameof(Error), new ErrorViewModel() { Message = "Invalid path input" });
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> NewFoldersFromFile(IFormFile file)
+        {
+            try
+            {
+                await _folderService.ReadFromFileAndSaveAsync(file);
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, redirectUrl = Url.Action(nameof(Error), new ErrorViewModel() { Message = "Inapropriate file or content" }) });
+            }
+            return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
+        }
+
+
+        public async Task<IActionResult> DownloadFile()
+        {
+            return await _folderService.WriteToFileAsync();
+        }
+
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error(ErrorViewModel errorViewModel)
+        {
+            return View(errorViewModel);
         }
     }
 }

@@ -1,0 +1,49 @@
+﻿@model Folders.Models.FolderManagementModel
+
+@using (Html.BeginForm("NewFoldersFromPC", "Home", FormMethod.Post))
+{
+    <div class="form-group">
+        @Html.LabelFor(m => m.FolderForScanPath)
+        @Html.TextBoxFor(m => m.FolderForScanPath, new { @class = "form-control" })
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Submit</button>
+}
+
+<div class="d-flex flex-column mt-3">
+    <a asp-action="DownloadFile" asp-controller="Home" class="download-link">Save current folders</a>
+    <div class="mt-2">
+        <p>Choose a file from your PC to upload a new folder schema</p>
+        <button type="button" onclick="selectFile()" class="btn btn-dark">Select File</button>
+        <label for="fileInput" style="display: none;">File input</label>
+        <input type="file" id="fileInput" style="display: none;" accept=".txt"/>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        function selectFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            var selectedFile = e.target.files[0];
+            var formData = new FormData();
+            formData.append('file', selectedFile);
+
+            $.ajax({
+                type: "POST",
+                url: "/Home/NewFoldersFromFile",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    window.location.href = result.redirectUrl;
+                },
+                error: function (error) {
+                    window.location.href = result.redirectUrl;
+                }
+            });
+        });
+    </script>
+}

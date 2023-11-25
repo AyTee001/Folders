@@ -1,11 +1,15 @@
 ﻿@model Folders.DAL.Entities.Folder
 
 
-<div class="text-center">
+<div>
 
-    <h2 class="display-4">"Folder" - @Model.Name</h2>
+    <h2>"Folder" - @Model.Name</h2>
 
-    @if(Model.Children is not null)
+    @if(Model.Children is null || !Model.Children.Any())
+    {
+        <p>This folder has no descendants</p>
+    }
+    else
     {
         <ul>
             @foreach (var entity in Model.Children)
@@ -15,9 +19,5 @@
                 </li>
             }
         </ul>
-    }
-    else
-    {
-        <h3>This folder has no children</h3>
     }
 </div>

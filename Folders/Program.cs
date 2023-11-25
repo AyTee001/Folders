@@ -1,7 +1,9 @@
 using Folders.DAL.Context;
+using Folders.Extensions;
 using Folders.Interfaces;
 using Folders.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace Folders
 {
@@ -19,9 +21,13 @@ namespace Folders
                     builder.Configuration.GetConnectionString("FolderAppDBConnection"),
                     opt => opt.MigrationsAssembly(typeof(FolderAppContext).Assembly.GetName().Name)));
 
+            builder.Services.AddAutoMapper(Assembly.GetEntryAssembly());
+
             builder.Services.AddScoped<IFolderService, FolderService>();
 
             var app = builder.Build();
+
+            app.UseFolderAppContext();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
